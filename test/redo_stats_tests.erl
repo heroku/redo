@@ -36,13 +36,15 @@ parse_line_test() ->
     ?assertEqual({<<"Server">>, [], []},
                  redo_stats:parse_line(<<"# Server">>, {undefined, [], []})),
 
-    ?assertEqual({undefined, [], [{<<"version">>, <<"2.8.19">>}]},
+    %% When we find a new key, it should be added to the current section.
+    ?assertEqual({undefined, [{<<"version">>, <<"2.8.19">>}], []},
                  redo_stats:parse_line(<<"version:2.8.19">>, {undefined, [], []})),
 
-    ?assertEqual({undefined, [], [{<<"sha1">>, <<"abcdef">>}, {<<"version">>, <<"2.8.19">>}]},
-                 redo_stats:parse_line(<<"sha1:abcdef">>, {undefined, [], [{<<"version">>, <<"2.8.19">>}]})),
+    %% When we find another key, it should be prepended to the current section.
+    ?assertEqual({undefined, [{<<"sha1">>, <<"abcdef">>}, {<<"version">>, <<"2.8.19">>}], []},
+                 redo_stats:parse_line(<<"sha1:abcdef">>, {undefined, [{<<"version">>, <<"2.8.19">>}], []})),
 
-    %% When we add a section to the previous sections, they should be in the
-    %% same order as we found them.
-    ?assertEqual({undefined, [{<<"Server">>, [{<<"sha1">>, <<"abcdef">>}, {<<"version">>, <<"1.0">>}]}], []},
-                 redo_stats:parse_line(<<>>, {<<"Server">>, [], [{<<"version">>, <<"1.0">>},{<<"sha1">>, <<"abcdef">>}]})).
+    %% When we add a new section to the previous sections, the keys should be
+    %% added in the order we identified them.
+    ?assertEqual({undefined, [], [{<<"Server">>, [{<<"sha1">>, <<"abcdef">>}, {<<"version">>, <<"1.0">>}]}]},
+                 redo_stats:parse_line(<<>>, {<<"Server">>, [{<<"version">>, <<"1.0">>},{<<"sha1">>, <<"abcdef">>}], []})).
