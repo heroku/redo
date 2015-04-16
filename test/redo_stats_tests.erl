@@ -25,15 +25,24 @@
 
 parse_response_test() ->
     Response = <<"# Server\r\nversion:2.8.19\r\nsha1:00000000\r\n">>,
-    ?assertEqual([{<<"Server">>, [{<<"sha1">>, <<"00000000">>}, {<<"version">>, <<"2.8.19">>}]}],
+    ?assertEqual([{<<"Server">>, [{<<"version">>, <<"2.8.19">>}, {<<"sha1">>, <<"00000000">>}]}],
                  redo_stats:parse_response(Response)).
+
+get_stats_cmd_test() ->
+    ?assertEqual([<<"INFO">>, <<"default">>],
+                 redo_stats:get_stats_cmd(<<"default">>)).
 
 parse_line_test() ->
     ?assertEqual({<<"Server">>, [], []},
                  redo_stats:parse_line(<<"# Server">>, {undefined, [], []})),
+
     ?assertEqual({undefined, [], [{<<"version">>, <<"2.8.19">>}]},
                  redo_stats:parse_line(<<"version:2.8.19">>, {undefined, [], []})),
+
     ?assertEqual({undefined, [], [{<<"sha1">>, <<"abcdef">>}, {<<"version">>, <<"2.8.19">>}]},
                  redo_stats:parse_line(<<"sha1:abcdef">>, {undefined, [], [{<<"version">>, <<"2.8.19">>}]})),
-    ?assertEqual({undefined, [{<<"Server">>, [{<<"sha1">>, <<"abcdef">>}]}], []},
-                 redo_stats:parse_line(<<>>, {<<"Server">>, [], [{<<"sha1">>, <<"abcdef">>}]})).
+
+    %% When we add a section to the previous sections, they should be in the
+    %% same order as we found them.
+    ?assertEqual({undefined, [{<<"Server">>, [{<<"sha1">>, <<"abcdef">>}, {<<"version">>, <<"1.0">>}]}], []},
+                 redo_stats:parse_line(<<>>, {<<"Server">>, [], [{<<"version">>, <<"1.0">>},{<<"sha1">>, <<"abcdef">>}]})).

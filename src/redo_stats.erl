@@ -22,35 +22,38 @@
 %% OTHER DEALINGS IN THE SOFTWARE.
 -module(redo_stats).
 
--export([get_stats/1]).
+-export([get_stats/1
+        ,get_stats/2]).
 
 -ifdef(TEST).
 -compile(export_all).
 -endif.
 
 %% Fetch the stats from Redis and return a proplist of values.
--spec get_stats(atom() | pid()) -> [{term(), binary()}] | {'error', Reason::term()}.
+-spec get_stats(atom() | pid()) -> [{binary(), [{binary(), binary()}]}].
 get_stats(Conn) ->
-    parse_response(redo:cmd(Conn, get_stats_cmd())).
+    get_stats(Conn, <<"default">>).
+
+get_stats(Conn, Section) ->
+    parse_response(redo:cmd(Conn, get_stats_cmd(Section))).
 
 %%--------------------------------------------------------------------
 %% Internal functions
 %%--------------------------------------------------------------------
-
-get_stats_cmd() ->
-    [<<"INFO">>, <<"default">>].
+get_stats_cmd(Section) ->
+    [<<"INFO">>, Section].
 
 parse_response(Response) ->
-    Lines = re:split(Response, <<"\r\n">>),
+    Lines = binary:split(Response, <<"\r\n">>, [global]),
     {undefined, Sections, []} = lists:foldl(fun parse_line/2, {undefined, [], []}, Lines),
     Sections.
 
 parse_line(<<>>, {Section, AllSections, CurrentSection}) ->
-    {undefined, [{Section, CurrentSection}] ++ AllSections, []};
+    {undefined, [{Section, lists:reverse(CurrentSection)} | AllSections], []};
 
 parse_line(<<"# ", Section/binary>>, {undefined, AllSections, CurrentSection}) ->
     {Section, AllSections, CurrentSection};
 
 parse_line(Line, {Section, AllSections, CurrentSection}) ->
     [Key, Value] = binary:split(Line, <<":">>),
-    {Section, AllSections, [{Key, Value}] ++ CurrentSection}.
+    {Section, AllSections, [{Key, Value} | CurrentSection]}.
