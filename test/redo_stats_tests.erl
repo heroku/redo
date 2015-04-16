@@ -24,9 +24,14 @@
 -include_lib("eunit/include/eunit.hrl").
 
 parse_response_test() ->
-    Response = <<"# Server\r\nversion:2.8.19\r\nsha1:00000000\r\n">>,
+    Response1 = <<"# Server\r\nversion:2.8.19\r\nsha1:00000000\r\n">>,
     ?assertEqual([{<<"Server">>, [{<<"version">>, <<"2.8.19">>}, {<<"sha1">>, <<"00000000">>}]}],
-                 redo_stats:parse_response(Response)).
+                 redo_stats:parse_response(Response1)),
+
+    Response2 = <<"# Server\r\nversion:2.8.19\r\n\r\n# Client\r\nvalue:2000\r\n">>,
+    ?assertEqual([{<<"Server">>, [{<<"version">>, <<"2.8.19">>}]},
+                  {<<"Client">>, [{<<"value">>, <<"2000">>}]}],
+                 redo_stats:parse_response(Response2)).
 
 get_stats_cmd_test() ->
     ?assertEqual([<<"INFO">>, <<"default">>],

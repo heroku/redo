@@ -46,7 +46,7 @@ get_stats_cmd(Section) ->
 parse_response(Response) ->
     Lines = binary:split(Response, <<"\r\n">>, [global]),
     {undefined, [], Sections} = lists:foldl(fun parse_line/2, {undefined, [], []}, Lines),
-    Sections.
+    lists:reverse(Sections).
 
 parse_line(<<>>, {Section, CurrentSection, AllSections}) ->
     {undefined, [], [{Section, lists:reverse(CurrentSection)} | AllSections]};
