@@ -1,8 +1,15 @@
 {application, redo,
  [
   {description, "Pipelined Redis Erlang Driver"},
-  {vsn, "1.1.0"},
+  {vsn, "2.0.0"},
   {registered, []},
   {applications, [kernel,stdlib]},
-  {env, []}
+  {env, []},
+
+  {contributors, ["Jacob Vorreuter", "Geoff Cant",
+                  "Fred Hebert", "Omar Yasin",
+                  "Kevin McDermott", "Krzysztof Rutka",
+                  "Andras Boroska", "Michal Ptaszek"]},
+  {licenses, ["MIT"]},
+  {links, [{"Github", "https://github.com/heroku/redo"}]}
  ]}.
