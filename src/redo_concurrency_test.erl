@@ -49,7 +49,7 @@ worker(Parent, N, 0) ->
     Parent ! {self(), N, done};
 
 worker(Parent, N, NumOps) ->
-    random:seed(now()),
+    random:seed(os:timestamp()),
     StrN = integer_to_list(N),
     StrOp = integer_to_list(NumOps),
     case random:uniform(100) of

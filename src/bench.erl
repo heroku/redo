@@ -3,19 +3,19 @@
 
 sync(Num) ->
     Redo = setup(),
-    A = now(),
+    A = os:timestamp(),
     ok = loop(Redo, Num),
-    B = now(),
+    B = os:timestamp(),
     print(Num,A,B),
     ok.
 
 async(Num, Concurrency) ->
     Redo = setup(),
     Self = self(),
-    A = now(),
+    A = os:timestamp(),
     Pids = [spawn_link(fun() -> loop(Redo, Num div Concurrency), Self ! {self(), done} end) || _ <- lists:seq(1, Concurrency)],
     [receive {Pid, done} -> ok end || Pid <- Pids],
-    B = now(),
+    B = os:timestamp(),
     print(Num,A,B), 
     ok.
 
