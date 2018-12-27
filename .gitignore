@@ -3,3 +3,4 @@ src/*.swp
 ebin
 .eunit
 .rebar
+_build/

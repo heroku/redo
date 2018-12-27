@@ -50,7 +50,7 @@ seq_test_() ->
       fun start/0,
       fun stop/1,
       fun(Pid) ->
-        Key = lists:flatten(io_lib:format("~p-~p", [make_ref(),now()])),
+        Key = lists:flatten(io_lib:format("~p-~p", [make_ref(),os:timestamp()])),
         Cmds = [redo_block:cmd(Pid, ["EXISTS", Key]),
                 redo_block:cmd(Pid, ["SET", Key, "1"]),
                 redo_block:cmd(Pid, ["GET", Key]),
@@ -71,7 +71,7 @@ parallel_test_() ->
       fun(Pid) ->
         Parent = self(),
         Keygen = fun() ->
-            iolist_to_binary(io_lib:format("~p-~p", [make_ref(),now()]))
+            iolist_to_binary(io_lib:format("~p-~p", [make_ref(),os:timestamp()]))
         end,
         %% Takes a unique key, inserts it, then reads it. With hundreds of concurrent
         %% processes, if redo_block doesn't behave well, the val read might be different
@@ -97,7 +97,7 @@ timeout_test_() ->
       fun start/0,
       fun stop/1,
       fun(Pid) ->
-        Key = lists:flatten(io_lib:format("~p-~p", [make_ref(),now()])),
+        Key = lists:flatten(io_lib:format("~p-~p", [make_ref(),os:timestamp()])),
         Cmds = [redo_block:cmd(Pid, ["EXISTS", Key]),
                 redo_block:cmd(Pid, ["SET", Key, "1"]),
                 redo_block:cmd(Pid, ["GET", Key], 0),
@@ -119,7 +119,7 @@ parallel_timeout_test_() ->
       fun(Pid) ->
         Parent = self(),
         Keygen = fun() ->
-            iolist_to_binary(io_lib:format("~p-~p", [make_ref(),now()]))
+            iolist_to_binary(io_lib:format("~p-~p", [make_ref(),os:timestamp()]))
         end,
         %% Takes a unique key, inserts it, then reads it. With hundreds of concurrent
         %% processes, if redo_block doesn't behave well, the val read might be different

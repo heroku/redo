@@ -175,7 +175,7 @@ schedule(S=#state{worker=undefined, opts=Opts}) ->
     case redo:start_link(undefined, Opts) of
         {ok, Worker} ->
             schedule(S#state{worker=Worker, worker_status=free});
-        {stop, Err} ->
+        {error, Err} ->
             {error, Err}
     end;
 schedule(S=#state{worker=Pid, worker_status=free, timers=T, queue=Q}) ->
