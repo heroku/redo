@@ -49,10 +49,9 @@ worker(Parent, N, 0) ->
     Parent ! {self(), N, done};
 
 worker(Parent, N, NumOps) ->
-    random:seed(now()),
     StrN = integer_to_list(N),
     StrOp = integer_to_list(NumOps),
-    case random:uniform(100) of
+    case rand:uniform(100) of
         R when R > 0, R =< 24 ->
             Key = iolist_to_binary([StrN, ":", StrOp, ":STRING"]),
             Val = iolist_to_binary(["STRING:", StrN, ":", StrOp]),
